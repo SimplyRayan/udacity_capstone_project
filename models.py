@@ -9,11 +9,10 @@ import os
 
 
 database_name = "capstone"
-if 'DATABASE_URI' in os.environ:
-    DATABASE_URL = os.environ['DATABASE_URI']
+if 'DATABASE_URL' in os.environ:
+    DATABASE_URL = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
 else:
     DATABASE_URL = "postgresql://postgres:postgres@{}/{}".format('localhost:5432', database_name)
-
 
 
 db = SQLAlchemy()
