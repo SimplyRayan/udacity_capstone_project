@@ -9,8 +9,8 @@ import os
 
 
 database_name = "capstone"
-if 'DATABASE_URL' in os.environ:
-    DATABASE_URL = os.environ['DATABASE_URL']
+if 'DATABASE_URI' in os.environ:
+    DATABASE_URL = os.environ['DATABASE_URI']
 else:
     DATABASE_URL = "postgresql://postgres:postgres@{}/{}".format('localhost:5432', database_name)
 
