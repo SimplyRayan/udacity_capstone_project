@@ -14,11 +14,14 @@ CORS(app)
 # setup_db(app)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})  # Gotta check this later?
 
-
+URL="NONE"
+if 'DATABASE_URL' in os.environ:
+    URL =os.environ['DATABASE_URL']
 @app.route('/')
 def index():
     return jsonify({
-        'message':'Hello'
+        'message':'Hello',
+        'DATABASE_URL':URL
     })
 
 
