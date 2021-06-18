@@ -2,7 +2,7 @@ from logging import Formatter
 from werkzeug.exceptions import HTTPException
 
 from flask import Flask, json,jsonify,request,abort
-# from models import db,setup_db,Collection,Image
+from models import db,setup_db,Collection,Image
 from flask_cors import CORS
 
 from auth import AuthError,requires_auth
@@ -11,7 +11,7 @@ import os
 
 app =Flask(__name__)
 CORS(app)
-# setup_db(app)
+setup_db(app)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})  # Gotta check this later?
 
 URL="NONE"

@@ -19,6 +19,7 @@ else:
 db = SQLAlchemy()
     
 def setup_db(app, database_path=DATABASE_URL,testing=False):
+    print('SETTING UP DATABASE: ',DATABASE_URL)
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
