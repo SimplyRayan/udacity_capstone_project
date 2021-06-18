@@ -1,7 +1,7 @@
 from logging import Formatter
 from werkzeug.exceptions import HTTPException
 
-from flask import Flask, json,jsonify,request,abort
+from flask import Flask, json,jsonify,request,abort,render_template
 from models import db,setup_db,Collection,Image
 from flask_cors import CORS
 
@@ -14,14 +14,11 @@ CORS(app)
 setup_db(app)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})  # Gotta check this later?
 
-URL="NONE"
-if 'DATABASE_URI' in os.environ:
-    URL =os.environ['DATABASE_URI']
+
 @app.route('/')
 def index():
     return jsonify({
         'message':'Hello',
-        'DATABASE_URI':URL
     })
 
 
