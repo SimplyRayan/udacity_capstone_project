@@ -5,7 +5,7 @@
 
 ## Running the project
 
-### THE SERVER IS UP AND RUNNING HERE:
+### THE SERVER IS UP AND RUNNING HERE: https://capstone-every-image.herokuapp.com/
 #### But In case you wanted to run it locally you can follow these steps
 ##### first you might want to create a virtual environment, after that you can run the following:  
 

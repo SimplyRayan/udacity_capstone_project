@@ -5,11 +5,9 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-
 AUTH0_DOMAIN = 'fsnd-course.eu.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'every_image'
-
 
 
 class AuthError(Exception):
@@ -19,7 +17,7 @@ class AuthError(Exception):
 
 
 def get_token_auth_header():
-    
+
     header = request.headers.get('Authorization')
     if not header:
         raise AuthError({
@@ -38,9 +36,8 @@ def get_token_auth_header():
     return header_content[1]
 
 
-
 def check_permissions(permission, payload):
-    
+
     if 'permissions' not in payload:
         print('no permission in payload')
         raise AuthError({
@@ -59,8 +56,6 @@ def check_permissions(permission, payload):
 
     # User is authorized to access the requested endpoint
     return True
-
-
 
 
 def verify_decode_jwt(token):
@@ -127,7 +122,6 @@ def verify_decode_jwt(token):
         'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
     }, 400)
-
 
 
 def requires_auth(permission=''):

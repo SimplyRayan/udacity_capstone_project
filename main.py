@@ -1,24 +1,25 @@
 from logging import Formatter
 from werkzeug.exceptions import HTTPException
 
-from flask import Flask, json,jsonify,request,abort,render_template
-from models import db,setup_db,Collection,Image
+from flask import Flask, json, jsonify, request, abort, render_template
+from models import db, setup_db, Collection, Image
 from flask_cors import CORS
 
-from auth import AuthError,requires_auth
+from auth import AuthError, requires_auth
 import sys
 import os
 
-app =Flask(__name__)
+app = Flask(__name__)
 CORS(app)
 setup_db(app)
-cors = CORS(app, resources={r"/*": {"origins": "*"}})  # Gotta check this later?
+# Gotta check this later?
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 @app.route('/')
 def index():
     return jsonify({
-        'message':'Hello',
+        'message': 'Hello',
     })
 
 
@@ -27,16 +28,16 @@ def get_collections():
     try:
         collections = Collection.query.all()
         formatted_collections = []
-        
+
         for collection in collections:
             formatted_collections.append(collection.format())
 
         return jsonify({
-            'success':True,
-            'collections':formatted_collections
+            'success': True,
+            'collections': formatted_collections
         })
     except Exception:
-        print("ERROR",sys.exc_info())
+        print("ERROR", sys.exc_info())
         abort(422)
 
 
@@ -48,8 +49,8 @@ def get_specific_collection(id):
             abort(404)
 
         return jsonify({
-            'success':True,
-            'collection':collection.format()
+            'success': True,
+            'collection': collection.format()
         })
     except Exception as e:
         if isinstance(e, HTTPException):
@@ -59,31 +60,27 @@ def get_specific_collection(id):
         abort(422)
 
 
-
-
-@app.route('/collections',methods=['POST'])
+@app.route('/collections', methods=['POST'])
 @requires_auth(permission="post:collection")
 def add_collection():
     try:
         data = request.get_json()
 
-        newCollection = Collection(title=data['title'],description=data['description'])
+        newCollection = Collection(
+            title=data['title'], description=data['description'])
         newCollection.insert()
 
         return jsonify({
-            'success':True,
-            'collections':newCollection.format()
+            'success': True,
+            'collections': newCollection.format()
         })
 
     except Exception:
-        print('ERROR',sys.exc_info())
+        print('ERROR', sys.exc_info())
         abort(422)
-    
-    
-        
 
 
-@app.route('/collections/<int:id>',methods=['PATCH'])
+@app.route('/collections/<int:id>', methods=['PATCH'])
 @requires_auth(permission="patch:collection")
 def edit_collection(id):
     try:
@@ -96,21 +93,21 @@ def edit_collection(id):
         data = request.get_json()
 
         if 'title' in data:
-            collection.title =  data['title']
-        
+            collection.title = data['title']
+
         if 'description' in data:
-            collection.description =  data['description']
-        
+            collection.description = data['description']
+
         collection.update()
-        
-        print('patched!',collection.title)
-        result =  jsonify({
-            'success':True,
-            'collection':collection.format()
+
+        print('patched!', collection.title)
+        result = jsonify({
+            'success': True,
+            'collection': collection.format()
         })
 
     except Exception as e:
-        print('errror in patching',sys.exc_info())
+        print('errror in patching', sys.exc_info())
         db.session.rollback()
         db.session.close()
         if isinstance(e, HTTPException):
@@ -119,11 +116,10 @@ def edit_collection(id):
     finally:
         db.session.close()
 
-    return result;
+    return result
 
 
-
-@app.route('/collections/<int:id>',methods=['DELETE'])
+@app.route('/collections/<int:id>', methods=['DELETE'])
 @requires_auth(permission="delete:collection")
 def delete_collection(id):
     try:
@@ -135,13 +131,13 @@ def delete_collection(id):
         collection.delete()
         print('deleted!')
         print(Collection.query.all())
-        result =  jsonify({
-            'success':True,
+        result = jsonify({
+            'success': True,
         })
     except Exception as e:
         if isinstance(e, HTTPException):
             abort(e.code)
-        print("ERROR",sys.exc_info())
+        print("ERROR", sys.exc_info())
         db.session.rollback()
         db.session.close()
         abort(422)
@@ -159,24 +155,21 @@ def get_images():
     try:
         images = Image.query.all()
 
-        formatted_images=[]
+        formatted_images = []
 
         for image in images:
             formatted_images.append(image.format())
 
         return jsonify({
-            'success':True,
-            'images':formatted_images
+            'success': True,
+            'images': formatted_images
         })
     except Exception as e:
         if isinstance(e, HTTPException):
             abort(e.code)
-        
+
         print(sys.exc_info())
         abort(422)
-
-
-
 
 
 @app.route('/collections/<int:id>/images')
@@ -187,28 +180,25 @@ def get_colleciton_images(id):
         if collection == None:
             abort(404)
 
-        formatted_images=[]
+        formatted_images = []
         for image in collection.images:
             formatted_images.append(image.format())
 
         return jsonify({
-            'success':True,
-            'title':collection.title,
-            'description':collection.description,
-            'images':formatted_images
+            'success': True,
+            'title': collection.title,
+            'description': collection.description,
+            'images': formatted_images
         })
     except Exception as e:
         if isinstance(e, HTTPException):
             abort(e.code)
-        
+
         print(sys.exc_info())
         abort(422)
 
 
-
-
-
-@app.route('/collections/<int:id>/images',methods=['POST'])
+@app.route('/collections/<int:id>/images', methods=['POST'])
 @requires_auth(permission="post:image")
 def add_colleciton_images(id):
     try:
@@ -216,33 +206,30 @@ def add_colleciton_images(id):
         collection = Collection.query.get(id)
         if collection == None:
             abort(404)
-        
+
         data = request.get_json()
 
-        newImage = Image(title=data['title'],image_link=data['image_link'])
+        newImage = Image(title=data['title'], image_link=data['image_link'])
 
         collection.images.append(newImage)
         db.session.add(collection)
         db.session.commit()
 
         return jsonify({
-            'success':True,
-            'image':newImage.format()
+            'success': True,
+            'image': newImage.format()
         })
     except Exception as e:
         if isinstance(e, HTTPException):
             abort(e.code)
-    
+
         print(sys.exc_info())
         db.session.rollback()
         db.session.close()
         abort(422)
 
 
-
-
-
-@app.route('/images/<int:id>',methods=['PATCH'])
+@app.route('/images/<int:id>', methods=['PATCH'])
 @requires_auth(permission="patch:image")
 def edit_image(id):
     try:
@@ -250,34 +237,33 @@ def edit_image(id):
         image = Image.query.get(id)
         if image == None:
             abort(404)
-        
+
         data = request.get_json()
-    
+
         print(image)
         if 'title' in data:
-            image.title =  data['title']
-        
+            image.title = data['title']
+
         if 'image_link' in data:
-            image.image_link =  data['image_link']
-        
+            image.image_link = data['image_link']
+
         db.session.commit()
 
         return jsonify({
-            'success':True,
-            'image':image.format()
+            'success': True,
+            'image': image.format()
         })
     except Exception as e:
         if isinstance(e, HTTPException):
             abort(e.code)
-    
+
         print(sys.exc_info())
         db.session.rollback()
         db.session.close()
         abort(422)
 
 
-
-@app.route('/images/<int:id>',methods=['DELETE'])
+@app.route('/images/<int:id>', methods=['DELETE'])
 @requires_auth(permission="delete:image")
 def delete_image(id):
     try:
@@ -290,54 +276,52 @@ def delete_image(id):
         db.session.commit()
 
         return jsonify({
-            'success':True,
+            'success': True,
         })
     except Exception as e:
         if isinstance(e, HTTPException):
             abort(e.code)
-    
+
         print(sys.exc_info())
         db.session.rollback()
         db.session.close()
         abort(422)
 
 
-
-
 @app.errorhandler(404)
 def handle_404_error(error):
     return jsonify({
-        'success':False,
-        'code':'404',
-        'message':'requested resources could not be found'
-    }),404
-
+        'success': False,
+        'code': '404',
+        'message': 'requested resources could not be found'
+    }), 404
 
 
 @app.errorhandler(422)
 def handle_404_error(error):
     return jsonify({
-        'success':False,
-        'code':'422',
-        'message':'Unprocessable'
-    }),422
+        'success': False,
+        'code': '422',
+        'message': 'Unprocessable'
+    }), 422
 
 
 @app.errorhandler(400)
 def handle_404_error(error):
     return jsonify({
-        'success':False,
-        'code':'400',
-        'message':'BAD REQUEST'
-    }),400
+        'success': False,
+        'code': '400',
+        'message': 'BAD REQUEST'
+    }), 400
+
 
 @app.errorhandler(500)
 def handle_404_error(error):
     return jsonify({
-        'success':False,
-        'code':'500',
-        'message':'Internal server error'
-    }),500
+        'success': False,
+        'code': '500',
+        'message': 'Internal server error'
+    }), 500
 
 
 @app.errorhandler(AuthError)
@@ -345,7 +329,5 @@ def handle_auth_error(exception):
     return jsonify(exception.error), exception.status_code
 
 
-
-
-if __name__ =='__main__': 
+if __name__ == '__main__':
     app.run(debug=True)
