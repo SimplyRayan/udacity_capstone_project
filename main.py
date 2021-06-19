@@ -331,6 +331,13 @@ def handle_404_error(error):
         'message':'BAD REQUEST'
     }),400
 
+@app.errorhandler(500)
+def handle_404_error(error):
+    return jsonify({
+        'success':False,
+        'code':'500',
+        'message':'Internal server error'
+    }),500
 
 
 @app.errorhandler(AuthError)
